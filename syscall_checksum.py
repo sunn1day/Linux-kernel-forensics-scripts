@@ -163,7 +163,7 @@ systab32_size = int(int(str(gdb.parse_and_eval("(unsigned long long) sizeof(ia32
 systab32_entries = Sym_kernel_dyn.parse_dyn_symtable(systab32_addr, systab32_size)
 
 
-def hash_syscall(baddr, entries, entry_size=8):
+def hash_syscall(baddr, entries, entry_size=8, stop_on_fail=False):
   ret = True
   for i, x in enumerate(entries) :
     tmp_obj = [ x for x in sym_addr_lookup[x.addr] if "_sys_" in x.sym ][0]
@@ -187,7 +187,8 @@ def hash_syscall(baddr, entries, entry_size=8):
         print("[!] Warning: Unmatch checksums found at syscall '{}' address: 0x{:x}".format(x.sym, x.addr))
         print(" \--> kernel running sha256: {}".format(x.bb_dynamic_checksum))
         print(" \--> vmlinux image  sha256: {}".format(x.bb_static_checksum))
-    break
+      if stop_on_fail :
+        break
 
   return ret
 
